@@ -4,8 +4,10 @@
     "description": "Simulate the Card Aging Power Up",
     "manifest_version": 2,
     "content_scripts": [{
-        "matches": ["https://trello.com/b/*"],
+        "amatches": ["https://trello.com/b/*"],
+        "matches": ["<all_urls>"],
         "js": ["jquery-3.1.0.js", "logic.js"],
+        "css": ["style.css"],
         "run_at": "document_start"
     }],
     "icons": {
@@ -18,7 +20,9 @@
     },
     "author": "fernand-o",
     "background": {
-        "scripts": ["background.js"]
+        "scripts": ["jquery-3.1.0.js", "background.js"]
     },
-    "permissions": ["tabs", "https://trello.com/b/*"]
+    "permissions": ["tabs", "storage", "https://trello.com/b/*"]
+
+
 }

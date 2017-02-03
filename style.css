@@ -1,0 +1,40 @@
+.last_modification_span{
+  font-size: 0.714286rem;
+  text-align: center;
+  line-height: 1.14286rem;
+  height: inherit;
+  display: inline;
+  float: right;
+  padding: 0px 0.5em !important;
+}
+
+#form_options table{
+  background: #eee;
+  padding: 6px;
+  margin: 5px;
+  width: 260px;
+}
+
+#form_options span{
+  font-family: sans-serif;
+  font-size: 13px;
+}
+
+#form_options td{
+  font-family: sans-serif;
+  font-size: 13px;
+  width: 50px;
+}
+
+#form_options .title{
+  font-weight: bold;
+  text-transform: none;
+  letter-spacing: 0;
+  word-spacing: -1px;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+#form_options input[type="submit"]{
+  margin: 5px;
+}
