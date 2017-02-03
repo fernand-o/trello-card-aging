@@ -9,7 +9,7 @@
   <form id="form_options">
     <table>
       <tr><td class="title">Aging Effect</td></tr>
-      <tr><td>Enabled</td><td><input type="checkbox" name="apply_aging" /></td></tr>
+      <tr><td>Enabled</td><td><input type="checkbox" name="apply_aging" checked="true" /></td></tr>
       <tr><td>Style</td><td>
         <select name="apply_aging_style">
           <option value='pirate'>Pirate</option>
@@ -19,14 +19,14 @@
     </table>
 
     <table>
-      <tr><td class="title">Display last modification</td></tr>
-      <tr><td>Enabled</td><td><input type="checkbox" name="show_age" /></td></tr>
-      <tr><td>Text color</td><td><input type="color" name="show_age_text_color"></td></tr>
-      <tr><td>Background color</td><td><input type="color" name="show_age_bg_color"></td></tr>
+      <tr><td colspan="2" class="title">Display last modification</td></tr>
+      <tr><td>Enabled</td><td><input type="checkbox" name="show_age" checked="true"/></td></tr>
+      <tr><td>Text color</td><td><input type="color" name="show_age_text_color" value="#cccccc"></td></tr>
+      <tr><td>Background color</td><td><input type="color" name="show_age_bg_color" value="#000000"></td></tr>
     </table>
 
     <input type="submit" value="Save">
-    <span>(Reload the page to take effects)</span>
+    <span>(Refresh the page to take effect)</span>
   </form>
 </div>
 <script src="jquery-3.1.0.js"></script>

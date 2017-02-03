@@ -1,11 +1,10 @@
 {
     "name": "Trello Card Aging",
-    "version": "1.1",
+    "version": "1.3",
     "description": "Simulate the Card Aging Power Up",
     "manifest_version": 2,
     "content_scripts": [{
-        "amatches": ["https://trello.com/b/*"],
-        "matches": ["<all_urls>"],
+        "matches": ["https://trello.com/b/*"],
         "js": ["jquery-3.1.0.js", "logic.js"],
         "css": ["style.css"],
         "run_at": "document_start"
@@ -16,7 +15,8 @@
         "256": "icon256.png"
     },
     "browser_action": {
-        "default_icon": "icon64.png"
+        "default_icon": "icon64.png",
+        "default_popup": "options.html"
     },
     "author": "fernand-o",
     "background": {

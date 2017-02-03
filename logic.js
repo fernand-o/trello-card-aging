@@ -1,4 +1,4 @@
-var debugging = true;
+var debugging = false;
 
 function log(text){
   if (debugging)
@@ -140,5 +140,5 @@ function start_effects_timer(config_as_string) {
     setTimeout(
       function(){
         process_all_cards();
-      }, 1000);    
+      }, 1000);
 }

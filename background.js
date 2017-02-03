@@ -1,33 +1,18 @@
-var debugging = true;
+var debugging = false;
 
 function log(text){
   if (debugging)
     console.log(text);
 };
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {    
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
     if ((changeInfo.title != undefined) && (changeInfo.title.includes('|'))) {
       log('Tab updated');
       log(tab);
       executed = true;
-      restore_options_and_execute(tab.id, changeInfo.title);
+      restore_options_and_execute(tab.id, changeInfo.title, execute_with_config);
     }
-});
-
-chrome.browserAction.onClicked.addListener(function(tab) {
-      chrome.tabs.create({
-          url: chrome.extension.getURL('options.html'),
-          active: false
-      }, function(tabe) {
-          chrome.windows.create({
-              tabId: tabe.id,
-              type: 'panel',
-              focused: true,
-              width: 300,
-              height: 350
-          });
-      });
 });
 
 function save_options(options) {
@@ -41,7 +26,8 @@ function save_options(options) {
   });
 }
 
-function restore_options_and_execute(tabid, title) {
+function restore_options_and_execute(tabid, title, callback) {
+
   log('Restoring options');
   chrome.storage.local.get({
     formOptions: []
@@ -50,20 +36,31 @@ function restore_options_and_execute(tabid, title) {
     log(storage.formOptions);
 
     config = parse_config(storage.formOptions);
-    execute_with_config(config, title, tabid);
+    config.title = title;
+    config.tabid = tabid;
+    callback(config);
   });
 }
 
 function parse_config(options){
+  log('Parsing configs');
+
   config = {
     show_age: false,
-    show_age_bg_color: '#cccccc',
-    show_age_text_color: '#000000',
+    show_age_bg_color: '#000000',
+    show_age_text_color: '#cccccc',
     apply_aging: false,
     apply_aging_style: 'pirate'
   };
 
-  log('Parsing configs');
+  if (options.length == 0) {
+    log('Config is empty, defining defaults');
+    config.show_age = true;
+    config.apply_aging = true;
+    return config;
+  }
+
+  var config = {};
   $.each(options, function(idx, val){
     log('idx[' + idx +'] value:');
     log(val);
@@ -88,45 +85,12 @@ function parse_config(options){
   return config;
 }
 
-function execute_with_config(config, title, tabid){
-  config.title = title;
-  config.tabid = tabid;
+function execute_with_config(config){
 
-  log('Executing in Title['+ title +'] TabId['+ tabid +'] with config:');
+  log('Executing in Title['+ config.title +'] TabId['+ config.tabid +'] with config:');
   log(config);
 
-  chrome.tabs.executeScript(tabid, {
+  chrome.tabs.executeScript(config.tabid, {
     code: "start_effects_timer('"+ JSON.stringify(config) +"');"
   });
 };
-
-// chrome.tabs.onActivated.addListener(
-//   function (tabId, changeInfo, tab){
-//     log('Activated tab:');
-//     log(tabId);
-//     restore_options();
-//   });
-
-//document.addEventListener('DOMContentLoaded', restore_options);
-//document.getElementById('save').addEventListener('click', save_options);
-
-
-
-
-
-// chrome.runtime.onMessage.addListener(function(request) {
-//     if (request.type === 'toggle_age') {
-//         chrome.tabs.create({
-//             url: chrome.extension.getURL('dialog.html'),
-//             active: false
-//         }, function(tab) {
-//             // After the tab has been created, open a window to inject the tab
-//             chrome.windows.create({
-//                 tabId: tab.id,
-//                 type: 'popup',
-//                 focused: true
-//                 // incognito, top, left, ...
-//             });
-//         });
-//     }
-// });
