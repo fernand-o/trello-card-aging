@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Options</title>
+  <link href='style.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+<div id="box">
+  <form id="form_options">
+    <table>
+      <tr><td class="title">Aging Effect</td></tr>
+      <tr><td>Enabled</td><td><input type="checkbox" name="apply_aging" /></td></tr>
+      <tr><td>Style</td><td>
+        <select name="apply_aging_style">
+          <option value='pirate'>Pirate</option>
+          <option value="regular">Fade</option>
+        </select>
+      </td></tr>
+    </table>
+
+    <table>
+      <tr><td class="title">Display last modification</td></tr>
+      <tr><td>Enabled</td><td><input type="checkbox" name="show_age" /></td></tr>
+      <tr><td>Text color</td><td><input type="color" name="show_age_text_color"></td></tr>
+      <tr><td>Background color</td><td><input type="color" name="show_age_bg_color"></td></tr>
+    </table>
+
+    <input type="submit" value="Save">
+    <span>(Reload the page to take effects)</span>
+  </form>
+</div>
+<script src="jquery-3.1.0.js"></script>
+<script src="options.js"></script>
+</body>
+</html>
