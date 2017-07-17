@@ -38,7 +38,7 @@ function display_last_date(card, date){
   span_style = 'text-shadow: none; background-color: '+ global_config.show_age_bg_color + '; color: ' + global_config.show_age_text_color +';';
 
   div = $('<div/>', {
-    class: 'list-card-labels js-card-labels'
+    class: 'list-card-labels'
   }).insertAfter(card.find('.list-card-details:eq(0)'));//card.find('.list-card-details:eq(0)'));
 
   $('<span/>', {
@@ -97,7 +97,7 @@ function process_all_cards() {
 
     $('.list-card').each(function(i, o) {
 
-        link = $(o).find('.list-card-title').attr('href');
+        link = $(o).attr('href');
         link = link.split('/')[2];
         link = "https://trello.com/1/cards/" + link + "?actions=addAttachmentToCard%2CaddChecklistToCard%2CaddMemberToCard%2CcommentCard%2CcopyCommentCard%2CconvertToCardFromCheckItem%2CcreateCard%2CcopyCard%2CdeleteAttachmentFromCard%2CemailCard%2CmoveCardFromBoard%2CmoveCardToBoard%2CremoveChecklistFromCard%2CremoveMemberFromCard%2CupdateCard%3AidList%2CupdateCard%3Aclosed%2CupdateCard%3Adue%2CupdateCheckItemStateOnCard&actions_limit=1"
 
