@@ -38,3 +38,10 @@
 #form_options input[type="submit"]{
   margin: 5px;
 }
+
+#form_options input[type="text"]{
+  width: 60px;
+  text-transform: uppercase;
+  font-family: sans-serif;
+  font-weight: bold;  
+}

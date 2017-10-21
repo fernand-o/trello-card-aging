@@ -1,6 +1,6 @@
 {
     "name": "Trello Card Aging",
-    "version": "1.5",
+    "version": "1.6",
     "description": "Simulate the Card Aging Power Up",
     "manifest_version": 2,
     "content_scripts": [{
