@@ -38,7 +38,7 @@ function display_last_date(card, date){
   span_style = 'text-shadow: none; background-color: '+ global_config.show_age_bg_color + '; color: ' + global_config.show_age_text_color +';';
 
   div = $('<div/>', {
-    class: 'list-card-labels'
+    class: 'list-card-labels ext-labels'
   }).insertAfter(card.find('.list-card-details:eq(0)'));//card.find('.list-card-details:eq(0)'));
 
   $('<span/>', {
@@ -47,6 +47,25 @@ function display_last_date(card, date){
     style: span_style,
     text: '🕒 '+ display_date
   }).appendTo(div);
+}
+
+function display_real_age(card, date){
+  display_date = last_modified_date_description(date);
+  span_style = 'float:left; text-shadow: none; background-color: '+ global_config.show_real_age_bg_color + '; color: ' + global_config.show_real_age_text_color +';';
+
+  parent = card.find('.ext-labels')
+  if (parent.length == 0) {
+    parent = $('<div/>', {
+      class: 'list-card-labels ext-labels'
+    }).insertAfter(card.find('.list-card-details:eq(0)'));
+  }
+
+  $('<span/>', {
+    class: 'card-label last_modification_span',
+    title: 'Created at ' + date,
+    style: span_style,
+    text: display_date
+  }).appendTo(parent);
 }
 
 function last_modified_date_description(date){
@@ -96,18 +115,22 @@ function process_all_cards() {
     log('Processing all cards');
 
     $('.list-card').each(function(i, o) {
+      card = $(o);
 
-        link = $(o).attr('href');
-        link = link.split('/')[2];
-        link = "https://trello.com/1/cards/" + link + "?actions=addAttachmentToCard%2CaddChecklistToCard%2CaddMemberToCard%2CcommentCard%2CcopyCommentCard%2CconvertToCardFromCheckItem%2CcreateCard%2CcopyCard%2CdeleteAttachmentFromCard%2CemailCard%2CmoveCardFromBoard%2CmoveCardToBoard%2CremoveChecklistFromCard%2CremoveMemberFromCard%2CupdateCard%3AidList%2CupdateCard%3Aclosed%2CupdateCard%3Adue%2CupdateCheckItemStateOnCard&actions_limit=1"
+      if (effect_already_applied(card))
+        return;
 
-        $.ajax({
-            url: link,
-            success: function(result) {
-                if (!apply_effects($(o), result.actions[0].date))
-                  return false;
-            }
-        })
+      link = card.attr('href');
+      link = link.split('/')[2];
+      link = "https://trello.com/1/cards/" + link + "?actions=addAttachmentToCard%2CaddChecklistToCard%2CaddMemberToCard%2CcommentCard%2CcopyCommentCard%2CconvertToCardFromCheckItem%2CcreateCard%2CcopyCard%2CdeleteAttachmentFromCard%2CemailCard%2CmoveCardFromBoard%2CmoveCardToBoard%2CremoveChecklistFromCard%2CremoveMemberFromCard%2CupdateCard%3AidList%2CupdateCard%3Aclosed%2CupdateCard%3Adue%2CupdateCheckItemStateOnCard&actions_limit=100"
+
+      $.ajax({
+          url: link,
+          success: function(result) {
+              if (!apply_effects($(o), result.actions[0].date, result.actions[result.actions.length - 1].date))
+                return false;
+          }
+      })
     });
 }
 
@@ -120,15 +143,16 @@ function effect_already_applied(card){
   }
 }
 
-function apply_effects(card, date){
-    if (effect_already_applied(card))
-      return false;
+function apply_effects(card, last_mod_date, creation_date){
 
     if (global_config.show_age)
-      display_last_date(card, date);
+      display_last_date(card, last_mod_date);
+
+    if (global_config.show_real_age)
+      display_real_age(card, creation_date);
 
     if (global_config.apply_aging)
-      apply_style(card, date);
+      apply_style(card, last_mod_date);
 }
 
 function start_effects_timer(config_as_string) {
