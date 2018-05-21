@@ -5,32 +5,36 @@ function log(text){
     console.log(text);
 };
 
-function apply_style(card, date) {
-    today = new Date();
-    last_activity = date.split('T')[0];
-    last_activity = new Date(last_activity);
+function apply_style(cardShortLink, date) {
+  card = find_card_from_short_link(cardShortLink)
+  if (card.length == 0)
+    return;
 
-    timeDiff = Math.abs(today.getTime() - last_activity.getTime());
-    diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  today = new Date();
+  last_activity = date.split('T')[0];
+  last_activity = new Date(last_activity);
 
-    aging_level = 0;
+  timeDiff = Math.abs(today.getTime() - last_activity.getTime());
+  diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    if (diffDays > 27) {
-        aging_level = 3
-    } else if (diffDays > 13) {
-        aging_level = 2
-    } else if (diffDays > 6) {
-        aging_level = 1
-    }
+  aging_level = 0;
 
-    if (aging_level > 0){
-      card.removeClass('aging-pirate');
-      card.removeClass('aging-regular');
-      card.removeClass('aging-level-1');
-      card.removeClass('aging-level-2');
-      card.removeClass('aging-level-3');
-      card.addClass('aging-'+ global_config.apply_aging_style +' aging-level-' + aging_level);
-    };
+  if (diffDays > 27) {
+      aging_level = 3
+  } else if (diffDays > 13) {
+      aging_level = 2
+  } else if (diffDays > 6) {
+      aging_level = 1
+  }
+
+  if (aging_level > 0){
+    card.removeClass('aging-pirate');
+    card.removeClass('aging-regular');
+    card.removeClass('aging-level-1');
+    card.removeClass('aging-level-2');
+    card.removeClass('aging-level-3');
+    card.addClass('aging-'+ global_config.apply_aging_style +' aging-level-' + aging_level);
+  };
 }
 
 function display_last_date(cardShortLink, date){
@@ -182,14 +186,16 @@ function apply_last_modification(){
             return;
 
           action = card.actions[0];
-          display_last_date(action.data.card.idShort, action.date);
+
+          if (global_config.show_age)
+            display_last_date(action.data.card.idShort, action.date);
+
+          if (global_config.apply_aging)
+            apply_style(action.data.card.idShort, action.date);
         })
       }
     );
   });
-
-  // if (global_config.apply_aging)
-    // apply_style(card, last_mod_date);
 }
 
 function effects_applied(){
