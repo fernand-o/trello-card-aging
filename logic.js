@@ -33,7 +33,11 @@ function apply_style(card, date) {
     };
 }
 
-function display_last_date(card, date){
+function display_last_date(cardShortLink, date){
+  card = find_card_from_short_link(cardShortLink)
+  if (card.length == 0)
+    return;
+
   display_date = last_modified_date_description(date);
   span_style = 'text-shadow: none; background-color: '+ global_config.show_age_bg_color + '; color: ' + global_config.show_age_text_color +';';
 
@@ -49,7 +53,11 @@ function display_last_date(card, date){
   }).appendTo(div);
 }
 
-function display_real_age(card, date){
+function display_real_age(cardShortLink, date){
+  card = find_card_from_short_link(cardShortLink)
+  if (card.length == 0)
+    return;
+
   display_date = last_modified_date_description(date);
   span_style = 'float:left; text-shadow: none; background-color: '+ global_config.show_real_age_bg_color + '; color: ' + global_config.show_real_age_text_color +';';
 
@@ -111,8 +119,12 @@ function last_modified_date_description(date){
   return '';
 }
 
-function getBoardId(){
-  return $(location).attr('href').split('/')[4]
+function getBoardURL(){
+  return "https://trello.com/1/Boards/"+ $(location).attr('href').split('/')[4]
+}
+
+function find_card_from_short_link(shortLink){
+  return $('.list-card[href*="'+shortLink+'"]');
 }
 
 function apply_real_age(){
@@ -127,23 +139,57 @@ function apply_real_age(){
     "moveCardToBoard",
   ];
   actions = card_creation_actions.join(",");
-  link = "https://trello.com/1/Boards/"+getBoardId()+"/cards/visible?fields=id&actions="+actions;
+
   $.ajax({
-    url: link,
+    url: getBoardURL()+"/cards/visible?fields=id&actions="+actions,
     success: function(result) {
       result.forEach((o, i, a)=>{
         if (o.actions.length == 0)
           return;
 
         action = o.actions[o.actions.length - 1];
-        card = $('.list-card[href*="'+action.data.card.shortLink+'"]')
-        if (card.length == 0)
-          return;
-
-        display_real_age(card, action.date);
+        display_real_age(action.data.card.shortLink, action.date);
       })
     }
   })
+}
+
+function getListsIDs(){
+  var lists;
+  $.ajax({
+    url: getBoardURL() + "/lists/open",
+    success: (result) => {
+      lists = result.map((o) => {
+        return o.id;
+      })
+    },
+    async: false
+  });
+  return lists;
+}
+
+function apply_last_modification(){
+  if (!(global_config.show_age || global_config.apply_aging))
+    return;
+
+  lists = getListsIDs();
+  lists.forEach((listID) => {
+    $.get(
+      "https://trello.com/1/Lists/"+listID+"/cards?fields=id,name&actions=all",
+      (result) => {
+        result.forEach((card) => {
+          if (card.actions.length == 0)
+            return;
+
+          action = card.actions[0];
+          display_last_date(action.data.card.idShort, action.date);
+        })
+      }
+    );
+  });
+
+  // if (global_config.apply_aging)
+    // apply_style(card, last_mod_date);
 }
 
 function effects_applied(){
@@ -155,30 +201,12 @@ function apply_effects() {
       return;
 
     apply_real_age();
+    apply_last_modification();
 
     $('<div/>', {
       id: 'effects_applied',
       style: 'display:none'
     }).appendTo($('body'));
-
-    // $('.list-card').each(function(i, o) {
-    //   card = $(o);
-
-    //   if (effect_already_applied(card))
-    //     return;
-
-    //   link = card.attr('href');
-    //   link = link.split('/')[2];
-    //   link = "https://trello.com/1/cards/" + link + "?actions=addAttachmentToCard%2CaddChecklistToCard%2CaddMemberToCard%2CcommentCard%2CcopyCommentCard%2CconvertToCardFromCheckItem%2CcreateCard%2CcopyCard%2CdeleteAttachmentFromCard%2CemailCard%2CmoveCardFromBoard%2CmoveCardToBoard%2CremoveChecklistFromCard%2CremoveMemberFromCard%2CupdateCard%3AidList%2CupdateCard%3Aclosed%2CupdateCard%3Adue%2CupdateCheckItemStateOnCard&actions_limit=100"
-
-    //   $.ajax({
-    //       url: link,
-    //       success: function(result) {
-    //           if (!apply_effects($(o), result.actions[0].date, result.actions[result.actions.length - 1].date))
-    //             return false;
-    //       }
-    //   })
-    // });
 }
 
 function effect_already_applied(card){
@@ -189,15 +217,6 @@ function effect_already_applied(card){
     card.addClass(identifier_class);
   }
 }
-
-// function apply_effects(card, last_mod_date, creation_date){
-
-//     if (global_config.show_age)
-//       display_last_date(card, last_mod_date);
-
-//     if (global_config.apply_aging)
-//       apply_style(card, last_mod_date);
-// }
 
 function start_effects_timer(config_as_string) {
     log('Waiting for page fully loaded..');
