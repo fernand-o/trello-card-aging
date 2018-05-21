@@ -111,27 +111,74 @@ function last_modified_date_description(date){
   return '';
 }
 
-function process_all_cards() {
-    log('Processing all cards');
+function getBoardId(){
+  return $(location).attr('href').split('/')[4]
+}
 
-    $('.list-card').each(function(i, o) {
-      card = $(o);
+function apply_real_age(){
+  if (!global_config.show_real_age)
+    return;
 
-      if (effect_already_applied(card))
-        return;
+  card_creation_actions = [
+    "createCard",
+    "copyCard",
+    "convertToCardFromCheckItem",
+    "moveCardFromBoard",
+    "moveCardToBoard",
+  ];
+  actions = card_creation_actions.join(",");
+  link = "https://trello.com/1/Boards/"+getBoardId()+"/cards/visible?fields=id&actions="+actions;
+  $.ajax({
+    url: link,
+    success: function(result) {
+      result.forEach((o, i, a)=>{
+        if (o.actions.length == 0)
+          return;
 
-      link = card.attr('href');
-      link = link.split('/')[2];
-      link = "https://trello.com/1/cards/" + link + "?actions=addAttachmentToCard%2CaddChecklistToCard%2CaddMemberToCard%2CcommentCard%2CcopyCommentCard%2CconvertToCardFromCheckItem%2CcreateCard%2CcopyCard%2CdeleteAttachmentFromCard%2CemailCard%2CmoveCardFromBoard%2CmoveCardToBoard%2CremoveChecklistFromCard%2CremoveMemberFromCard%2CupdateCard%3AidList%2CupdateCard%3Aclosed%2CupdateCard%3Adue%2CupdateCheckItemStateOnCard&actions_limit=100"
+        action = o.actions[o.actions.length - 1];
+        card = $('.list-card[href*="'+action.data.card.shortLink+'"]')
+        if (card.length == 0)
+          return;
 
-      $.ajax({
-          url: link,
-          success: function(result) {
-              if (!apply_effects($(o), result.actions[0].date, result.actions[result.actions.length - 1].date))
-                return false;
-          }
+        display_real_age(card, action.date);
       })
-    });
+    }
+  })
+}
+
+function effects_applied(){
+  return $('#effects_applied').length == 1;
+}
+
+function apply_effects() {
+    if (effects_applied())
+      return;
+
+    apply_real_age();
+
+    $('<div/>', {
+      id: 'effects_applied',
+      style: 'display:none'
+    }).appendTo($('body'));
+
+    // $('.list-card').each(function(i, o) {
+    //   card = $(o);
+
+    //   if (effect_already_applied(card))
+    //     return;
+
+    //   link = card.attr('href');
+    //   link = link.split('/')[2];
+    //   link = "https://trello.com/1/cards/" + link + "?actions=addAttachmentToCard%2CaddChecklistToCard%2CaddMemberToCard%2CcommentCard%2CcopyCommentCard%2CconvertToCardFromCheckItem%2CcreateCard%2CcopyCard%2CdeleteAttachmentFromCard%2CemailCard%2CmoveCardFromBoard%2CmoveCardToBoard%2CremoveChecklistFromCard%2CremoveMemberFromCard%2CupdateCard%3AidList%2CupdateCard%3Aclosed%2CupdateCard%3Adue%2CupdateCheckItemStateOnCard&actions_limit=100"
+
+    //   $.ajax({
+    //       url: link,
+    //       success: function(result) {
+    //           if (!apply_effects($(o), result.actions[0].date, result.actions[result.actions.length - 1].date))
+    //             return false;
+    //       }
+    //   })
+    // });
 }
 
 function effect_already_applied(card){
@@ -143,17 +190,14 @@ function effect_already_applied(card){
   }
 }
 
-function apply_effects(card, last_mod_date, creation_date){
+// function apply_effects(card, last_mod_date, creation_date){
 
-    if (global_config.show_age)
-      display_last_date(card, last_mod_date);
+//     if (global_config.show_age)
+//       display_last_date(card, last_mod_date);
 
-    if (global_config.show_real_age)
-      display_real_age(card, creation_date);
-
-    if (global_config.apply_aging)
-      apply_style(card, last_mod_date);
-}
+//     if (global_config.apply_aging)
+//       apply_style(card, last_mod_date);
+// }
 
 function start_effects_timer(config_as_string) {
     log('Waiting for page fully loaded..');
@@ -163,6 +207,6 @@ function start_effects_timer(config_as_string) {
 
     setTimeout(
       function(){
-        process_all_cards();
-      }, 1000);
+        apply_effects();
+      }, 300);
 }
