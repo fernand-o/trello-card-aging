@@ -1,91 +1,34 @@
-var debugging = false;
+var Config = {};
 
-function log(text){
-  if (debugging)
-    console.log(text);
-};
-
-function apply_style(cardShortLink, date) {
-  card = find_card_from_short_link(cardShortLink)
+function applyCardAging(cardId, lastActivity) {
+  card = findCard(cardId);
   if (card.length == 0)
     return;
 
   today = new Date();
-  last_activity = date.split('T')[0];
-  last_activity = new Date(last_activity);
-
-  timeDiff = Math.abs(today.getTime() - last_activity.getTime());
+  timeDiff = Math.abs(today.getTime() - lastActivity.getTime());
   diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-  aging_level = 0;
-
+  agingLevel = 0;
   if (diffDays > 27) {
-      aging_level = 3
+    agingLevel = 3
   } else if (diffDays > 13) {
-      aging_level = 2
+    agingLevel = 2
   } else if (diffDays > 6) {
-      aging_level = 1
+    agingLevel = 1
   }
 
-  if (aging_level > 0){
-    card.removeClass('aging-pirate');
-    card.removeClass('aging-regular');
-    card.removeClass('aging-level-1');
-    card.removeClass('aging-level-2');
-    card.removeClass('aging-level-3');
-    card.addClass('aging-'+ global_config.apply_aging_style +' aging-level-' + aging_level);
+  if (agingLevel > 0){
+    for (let classname in ['aging-pirate', 'aging-regular', 'aging-level-1', 'aging-level-2', 'aging-level-3'])
+      card.removeClass(classname);
+
+    card.addClass('aging-'+ Config.apply_aging_style +' aging-level-'+ agingLevel);
   };
 }
 
-function display_last_date(cardShortLink, date){
-  card = find_card_from_short_link(cardShortLink)
-  if (card.length == 0)
-    return;
-
-  display_date = last_modified_date_description(date);
-  span_style = 'text-shadow: none; background-color: '+ global_config.show_age_bg_color + '; color: ' + global_config.show_age_text_color +';';
-
-  div = $('<div/>', {
-    class: 'list-card-labels ext-labels'
-  }).insertAfter(card.find('.list-card-details:eq(0)'));//card.find('.list-card-details:eq(0)'));
-
-  $('<span/>', {
-    class: 'card-label last_modification_span',
-    title: 'Last modification date',
-    style: span_style,
-    text: '🕒 '+ display_date
-  }).appendTo(div);
-}
-
-function display_real_age(cardShortLink, date){
-  card = find_card_from_short_link(cardShortLink)
-  if (card.length == 0)
-    return;
-
-  display_date = last_modified_date_description(date);
-  span_style = 'float:left; text-shadow: none; background-color: '+ global_config.show_real_age_bg_color + '; color: ' + global_config.show_real_age_text_color +';';
-
-  parent = card.find('.ext-labels')
-  if (parent.length == 0) {
-    parent = $('<div/>', {
-      class: 'list-card-labels ext-labels'
-    }).insertAfter(card.find('.list-card-details:eq(0)'));
-  }
-
-  $('<span/>', {
-    class: 'card-label last_modification_span',
-    title: 'Created at ' + date,
-    style: span_style,
-    text: display_date
-  }).appendTo(parent);
-}
-
-function last_modified_date_description(date){
+function dateDifferenceAsString(date){
   today = new Date();
   last_activity = new Date(date);
-
-  log('today ' + today);
-  log('last '+ last_activity);
   diffMilisec = Math.abs(today.getTime() - last_activity.getTime());
   diffSeconds = Math.ceil(diffMilisec / 1000);
   diffMinutes = Math.ceil(diffSeconds / 60);
@@ -94,31 +37,25 @@ function last_modified_date_description(date){
   diffMonths = Math.ceil(diffDays / 30);
   diffYears = Math.ceil(diffMonths / 12);
 
-  log(diffMilisec);
-  log(diffSeconds);
-  log(diffMinutes);
-  log(diffHours);
-  log(diffDays);
-
   msg = '';
 
   if (diffYears > 1)
-    return diffYears + ' years ago';
+    return diffYears + ' years';
 
   if (diffMonths > 1)
-    return  diffMonths + ' months ago';
+    return diffMonths + ' months';
 
   if (diffDays > 1)
-    return  diffDays + ' days ago';
+    return diffDays + ' days';
 
   if (diffHours > 1)
-    return  diffHours + ' hours ago';
+    return diffHours + ' hours';
 
   if (diffMinutes > 1)
-    return  diffMinutes + ' minutes ago';
+    return diffMinutes + ' minutes';
 
   if (diffSeconds > 1)
-    return  diffSeconds + ' seconds ago';
+    return  diffSeconds + ' seconds';
 
   return '';
 }
@@ -127,35 +64,108 @@ function getBoardURL(){
   return "https://trello.com/1/Boards/"+ $(location).attr('href').split('/')[4]
 }
 
-function find_card_from_short_link(shortLink){
+function findCard(shortLink){
   return $('.list-card[href*="'+shortLink+'"]');
 }
 
-function apply_real_age(){
-  if (!global_config.show_real_age)
+function spanRealAge(creationDate, displayDate){
+  return $('<span/>', {
+    text: displayDate,
+    title: 'Created at ' + creationDate.toLocaleDateString("en-US"),
+    class: 'card-label',
+    css: {
+      float: 'left',
+      color: Config.show_real_age_text_color,
+      "background-color": Config.show_real_age_bg_color,
+      "text-shadow": 'none'
+    }
+  });
+}
+
+function spanLastActivityDate(lastModDate, displayDate){
+  return $('<span/>', {
+    text: '🕒 ' + displayDate,
+    title: 'Last activity at ' + lastModDate.toLocaleDateString("en-US"),
+    class: 'card-label',
+    css: {
+      float: 'right',
+      color: Config.show_age_text_color,
+      "background-color": Config.show_age_bg_color,
+      "text-shadow": 'none'
+    }
+  });
+}
+
+function spanWrapper(cardId){
+  obj = findCard(cardId)
+  if (obj.length == 0)
+    return $('<div />');
+
+  wrapper = obj.find('.trello-card-aging-span-wrapper');
+  if (wrapper.length == 0){
+    wrapper = $('<div/>', {
+      class: 'list-card-labels trello-card-aging-span-wrapper'
+    }).insertAfter(obj.find('.list-card-details:eq(0)'));
+  }
+
+  return wrapper;
+}
+
+function applyRealAge(){
+  if (!Config.show_real_age)
     return;
 
-  card_creation_actions = [
+  cardCreationActions = [
     "createCard",
     "copyCard",
     "convertToCardFromCheckItem",
     "moveCardFromBoard",
-    "moveCardToBoard",
-  ];
-  actions = card_creation_actions.join(",");
+    "moveCardToBoard"
+  ].join(",");
 
   $.ajax({
-    url: getBoardURL()+"/cards/visible?fields=id&actions="+actions,
+    url: getBoardURL()+"/cards/visible?fields=id,shortLink&actions="+cardCreationActions,
     success: function(result) {
-      result.forEach((o, i, a)=>{
+      result.forEach((o)=>{
         if (o.actions.length == 0)
           return;
 
-        action = o.actions[o.actions.length - 1];
-        display_real_age(action.data.card.shortLink, action.date);
-      })
+        cardId = o.shortLink;
+        creationDate = new Date(o.actions[o.actions.length - 1].date);
+        displayDate = dateDifferenceAsString(creationDate);
+        if (Config.show_real_age)
+          spanRealAge(creationDate, displayDate).appendTo(spanWrapper(cardId));
+      });
     }
-  })
+  });
+}
+
+function applyLastActivity(){
+  if (!(Config.show_age || Config.apply_aging))
+    return;
+
+  lists = getListsIDs();
+  lists.forEach((listID) => {
+    $.ajax({
+      url: "https://trello.com/1/Lists/"+listID+"/cards?fields=id,shortLink&actions=all",
+      success: (result) => {
+        result.forEach((card) => {
+          if (card.actions.length == 0)
+            return;
+
+          lastModDate = new Date(card.actions[0].date);
+          displayDate = dateDifferenceAsString(lastModDate);
+          cardId = card.shortLink;
+
+          if (Config.show_age)
+            spanLastActivityDate(lastModDate, displayDate).appendTo(spanWrapper(cardId));
+
+          if (Config.apply_aging)
+            applyCardAging(cardId, lastModDate);
+        });
+      }
+    });
+  });
 }
 
 function getListsIDs(){
@@ -172,66 +182,30 @@ function getListsIDs(){
   return lists;
 }
 
-function apply_last_modification(){
-  if (!(global_config.show_age || global_config.apply_aging))
-    return;
-
-  lists = getListsIDs();
-  lists.forEach((listID) => {
-    $.get(
-      "https://trello.com/1/Lists/"+listID+"/cards?fields=id,name&actions=all",
-      (result) => {
-        result.forEach((card) => {
-          if (card.actions.length == 0)
-            return;
-
-          action = card.actions[0];
-
-          if (global_config.show_age)
-            display_last_date(action.data.card.idShort, action.date);
-
-          if (global_config.apply_aging)
-            apply_style(action.data.card.idShort, action.date);
-        })
-      }
-    );
-  });
-}
-
-function effects_applied(){
+function effectsApplied(){
   return $('#effects_applied').length == 1;
 }
 
-function apply_effects() {
-    if (effects_applied())
-      return;
-
-    apply_real_age();
-    apply_last_modification();
-
-    $('<div/>', {
-      id: 'effects_applied',
-      style: 'display:none'
-    }).appendTo($('body'));
+function setEffectsApplied(){
+  $('<div/>', {
+    id: 'effects_applied',
+    style: 'display:none'
+  }).appendTo($('body'));
 }
 
-function effect_already_applied(card){
-  identifier_class = 'ext-effects-identifier';
-  if (card.hasClass(identifier_class)){
-    return true
-  } else {
-    card.addClass(identifier_class);
-  }
+function loadConfig(configString){
+  Config = JSON.parse(configString);
 }
 
-function start_effects_timer(config_as_string) {
-    log('Waiting for page fully loaded..');
-    log('Config to be used:');
-    global_config = JSON.parse(config_as_string);
-    log(global_config);
+function start_effects_timer(configString) {
+  if (effectsApplied())
+    return;
 
-    setTimeout(
-      function(){
-        apply_effects();
-      }, 300);
+  loadConfig(configString);
+  setTimeout(()=>{
+    applyRealAge();
+    applyLastActivity();
+  }, 300)
+
+  setEffectsApplied();
 }
