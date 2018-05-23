@@ -2,7 +2,7 @@ document.forms[0].onsubmit = function(e) {
     e.preventDefault();
     var form = $('#form_options').serializeArray();
     chrome.runtime.getBackgroundPage(function(bgWindow) {
-        bgWindow.save_options(form);
+        bgWindow.saveConfigs(form);
         window.close();
     });
 };
