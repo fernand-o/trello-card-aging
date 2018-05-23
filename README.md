@@ -1,4 +1,4 @@
-# trello-card-aging
+# Trello card aging
 Chrome extension for Trello
 https://chrome.google.com/webstore/detail/trello-card-aging/eldafhhjhnfgkhpnicalopgocdbehkgj
 
@@ -10,7 +10,8 @@ Important reminder: In the official power up, the card aging is removed if someo
 
 
 To-do:
-- [ ] Choose wich date the aging effect will be based on.
-- [ ] Choose wich boards should be ignored.
+- [ ] Choose which date the aging effect will be based on.
+- [ ] Choose which boards should be ignored.
 - [ ] Choose the position of the labels.
 - [ ] Define formats for the displayed information.
+- [ ] Define custom time ranges for the aging effects.
