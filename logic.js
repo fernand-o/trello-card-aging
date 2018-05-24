@@ -197,7 +197,7 @@ function loadConfig(configString){
   Config = JSON.parse(configString);
 }
 
-function start_effects_timer(configString) {
+function applyEffects(configString) {
   if (effectsApplied())
     return;
 

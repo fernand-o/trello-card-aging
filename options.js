@@ -9,30 +9,30 @@ document.forms[0].onsubmit = function(e) {
 
 $(document).ready(function(){
 
-  function input_by_name(elm_name){
+  function inputByName(elm_name){
     return $("input[name='"+ elm_name +"']");
   }
 
-  function bind_color_input(color_input_name, text_input_name, default_color){
-    let color_input = input_by_name(color_input_name);
-    let text_input = input_by_name(text_input_name);
+  function bindColorInput(colorInputName, textInputName, defaultColor){
+    let colorInput = inputByName(colorInputName);
+    let textInput = inputByName(textInputName);
 
-    color_input.change(function(){
-      text_input.val(this.value);
+    colorInput.change(function(){
+      textInput.val(this.value);
     });
 
-    text_input.on('keyup', function(){
-      color_input.val(this.value);
+    textInput.on('keyup', function(){
+      colorInput.val(this.value);
     });
 
-    color_input.val(default_color);
-    text_input.val(default_color);
+    colorInput.val(defaultColor);
+    textInput.val(defaultColor);
   }
 
-  bind_color_input('text_color_picker', 'show_age_text_color', '#000000');
-  bind_color_input('bg_color_picker', 'show_age_bg_color', '#FFFFFF');
-  bind_color_input('text_color_picker_real_age', 'show_real_age_text_color', '#000000');
-  bind_color_input('bg_color_picker_real_age', 'show_real_age_bg_color', '#FFFFFF');
+  bindColorInput('text_color_picker', 'show_age_text_color', '#000000');
+  bindColorInput('bg_color_picker', 'show_age_bg_color', '#FFFFFF');
+  bindColorInput('text_color_picker_real_age', 'show_real_age_text_color', '#000000');
+  bindColorInput('bg_color_picker_real_age', 'show_real_age_bg_color', '#FFFFFF');
 
   chrome.storage.local.get({
     formOptions: []

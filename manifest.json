@@ -23,6 +23,4 @@
         "scripts": ["jquery-3.1.0.js", "background.js"]
     },
     "permissions": ["tabs", "storage", "https://trello.com/b/*"]
-
-
 }
