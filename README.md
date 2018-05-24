@@ -2,14 +2,20 @@
 Chrome extension for Trello
 https://chrome.google.com/webstore/detail/trello-card-aging/eldafhhjhnfgkhpnicalopgocdbehkgj
 
-Simulate the card aging power up on Trello boards.
+Provide some features related with the card age and activity.
 
-The aging is applied in 3 states, at 7, 14, or 28 days without any action in the card. 
+## Aging effect
+The aging effect is the same as the one provided from the Card Aging power-up, except for one detail:
+In the official power up, the card aging is removed if someone just change the card position (drag and drop) inside a list. This extension considers the last activity of the card, what might be a comment, atacchment, anything who left a log inside the card.
 
-Important reminder: In the official power up, the card aging is removed if someone just change the card position (drag and drop) inside a list. This extension considers the last activity of the card, what might be a comment, atacchment, anything who left a log inside the card.
+## Last activity
+Creates an indicator at the bottom of the card, that shows the time difference between now and the last activity of the card.
+
+## Card age
+Creates an indicator at the bottom of the card, that shows the time difference between now and the card creation.
 
 
-To-do:
+### To-do list. Allow users to:
 - [ ] Choose which date the aging effect will be based on.
 - [ ] Choose which boards should be ignored.
 - [ ] Choose the position of the labels.
