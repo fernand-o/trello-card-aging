@@ -144,42 +144,43 @@ function applyLastActivity(){
   if (!(Config.show_age || Config.apply_aging))
     return;
 
-  lists = getListsIDs();
-  lists.forEach((listID) => {
-    $.ajax({
-      url: "https://trello.com/1/Lists/"+listID+"/cards?fields=id,shortLink&actions=all",
-      success: (result) => {
-        result.forEach((card) => {
-          if (card.actions.length == 0)
-            return;
+  getListsIDsAndExecute(function(ids){
+    ids.forEach((listID) => {
+      $.ajax({
+        url: "https://trello.com/1/Lists/"+listID+"/cards?fields=id,shortLink&actions=all",
+        success: (result) => {
+          result.forEach((card) => {
+            if (card.actions.length == 0)
+              return;
 
-          lastModDate = new Date(card.actions[0].date);
-          displayDate = dateDifferenceAsString(lastModDate);
-          cardId = card.shortLink;
+            lastModDate = new Date(card.actions[0].date);
+            displayDate = dateDifferenceAsString(lastModDate);
+            cardId = card.shortLink;
 
-          if (Config.show_age)
-            spanLastActivityDate(lastModDate, displayDate).appendTo(spanWrapper(cardId));
+            if (Config.show_age)
+              spanLastActivityDate(lastModDate, displayDate).appendTo(spanWrapper(cardId));
 
-          if (Config.apply_aging)
-            applyCardAging(cardId, lastModDate);
-        });
-      }
+            if (Config.apply_aging)
+              applyCardAging(cardId, lastModDate);
+          });
+        }
+      });
     });
   });
 }
 
-function getListsIDs(){
-  var lists;
+function getListsIDsAndExecute(callback){
+  var ids;
   $.ajax({
     url: getBoardURL() + "/lists/open",
     success: (result) => {
-      lists = result.map((o) => {
+      ids = result.map((o) => {
         return o.id;
-      })
-    },
-    async: false
+      });
+
+      callback(ids);
+    }
   });
-  return lists;
 }
 
 function effectsApplied(){
