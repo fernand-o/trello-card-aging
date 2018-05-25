@@ -15,12 +15,15 @@ Creates an indicator at the bottom of the card, that shows the time difference b
 Creates an indicator at the bottom of the card, that shows the time difference between now and the card creation.
 
 
-### To-do list. Allow users to:
+### To-do lists.
+
+Allow users to:
 - [ ] Choose which date the aging effect will be based on.
 - [ ] Choose which boards should be ignored.
 - [ ] Choose the position of the labels.
 - [ ] Define formats for the displayed information.
 - [ ] Define custom time ranges for the aging effects.
-
 - [ ] Add new aging effects
+
+Improvements:
 - [ ] Improve the displayed times (1.1 year is being shown as 2 years)
