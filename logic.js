@@ -123,14 +123,27 @@ function getListsIDsAndExecute(callback){
   });
 }
 
+function dateDifferenceUntilToday(date){
+  today = new Date();
+  dateToCompare = new Date(date);
+
+  diff = {};
+  diff["seconds"] = (Math.abs(today.getTime() - dateToCompare.getTime())) / 1000;
+  diff["minutes"] = Math.ceil(diff["seconds"] / 60);
+  diff["hours"] = Math.ceil(diff["minutes"] / 60);
+  diff["days"] = Math.ceil(diff["hours"] / 24);
+  diff["months"] = Math.ceil(diff["days"] / 30);
+  diff["years"] = Math.ceil(diff["months"] / 12);
+
+  return diff;
+}
+
 function applyCardAging(cardId, lastActivity) {
   card = findCard(cardId);
   if (card.length == 0)
     return;
 
-  today = new Date();
-  timeDiff = Math.abs(today.getTime() - lastActivity.getTime());
-  diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  diffDays = dateDifferenceUntilToday(lastActivity)["days"];
 
   agingLevel = 0;
   if (diffDays > 27) {
@@ -150,18 +163,9 @@ function applyCardAging(cardId, lastActivity) {
 }
 
 function dateDifferenceAsString(date){
-  today = new Date();
-  lastActivity = new Date(date);
-
-  diff = {};
-  diff["seconds"] = (Math.abs(today.getTime() - lastActivity.getTime())) / 1000;
-  diff["minutes"] = Math.ceil(diff["seconds"] / 60);
-  diff["hours"] = Math.ceil(diff["minutes"] / 60);
-  diff["days"] = Math.ceil(diff["hours"] / 24);
-  diff["months"] = Math.ceil(diff["days"] / 30);
-  diff["years"] = Math.ceil(diff["months"] / 12);
-
+  diff = dateDifferenceUntilToday(date);
   keys = Object.getOwnPropertyNames(diff).reverse();
+
   for (let i in keys){
     key = keys[i];
     value = diff[key];
