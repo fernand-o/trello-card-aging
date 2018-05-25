@@ -1,65 +1,5 @@
 var Config = {};
 
-function applyCardAging(cardId, lastActivity) {
-  card = findCard(cardId);
-  if (card.length == 0)
-    return;
-
-  today = new Date();
-  timeDiff = Math.abs(today.getTime() - lastActivity.getTime());
-  diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-  agingLevel = 0;
-  if (diffDays > 27) {
-    agingLevel = 3
-  } else if (diffDays > 13) {
-    agingLevel = 2
-  } else if (diffDays > 6) {
-    agingLevel = 1
-  }
-
-  if (agingLevel > 0){
-    for (let classname in ['aging-pirate', 'aging-regular', 'aging-level-1', 'aging-level-2', 'aging-level-3'])
-      card.removeClass(classname);
-
-    card.addClass('aging-'+ Config.apply_aging_style +' aging-level-'+ agingLevel);
-  };
-}
-
-function dateDifferenceAsString(date){
-  today = new Date();
-  last_activity = new Date(date);
-  diffMilisec = Math.abs(today.getTime() - last_activity.getTime());
-  diffSeconds = Math.ceil(diffMilisec / 1000);
-  diffMinutes = Math.ceil(diffSeconds / 60);
-  diffHours = Math.ceil(diffMinutes / 60);
-  diffDays = Math.ceil(diffHours / 24);
-  diffMonths = Math.ceil(diffDays / 30);
-  diffYears = Math.ceil(diffMonths / 12);
-
-  msg = '';
-
-  if (diffYears > 1)
-    return diffYears + ' years';
-
-  if (diffMonths > 1)
-    return diffMonths + ' months';
-
-  if (diffDays > 1)
-    return diffDays + ' days';
-
-  if (diffHours > 1)
-    return diffHours + ' hours';
-
-  if (diffMinutes > 1)
-    return diffMinutes + ' minutes';
-
-  if (diffSeconds > 1)
-    return  diffSeconds + ' seconds';
-
-  return '';
-}
-
 function getBoardURL(){
   return "https://trello.com/1/Boards/"+ $(location).attr('href').split('/')[4]
 }
@@ -181,6 +121,54 @@ function getListsIDsAndExecute(callback){
       callback(ids);
     }
   });
+}
+
+function applyCardAging(cardId, lastActivity) {
+  card = findCard(cardId);
+  if (card.length == 0)
+    return;
+
+  today = new Date();
+  timeDiff = Math.abs(today.getTime() - lastActivity.getTime());
+  diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+  agingLevel = 0;
+  if (diffDays > 27) {
+    agingLevel = 3
+  } else if (diffDays > 13) {
+    agingLevel = 2
+  } else if (diffDays > 6) {
+    agingLevel = 1
+  }
+
+  if (agingLevel > 0){
+    for (let classname in ['aging-pirate', 'aging-regular', 'aging-level-1', 'aging-level-2', 'aging-level-3'])
+      card.removeClass(classname);
+
+    card.addClass('aging-'+ Config.apply_aging_style +' aging-level-'+ agingLevel);
+  };
+}
+
+function dateDifferenceAsString(date){
+  today = new Date();
+  lastActivity = new Date(date);
+
+  diff = {};
+  diff["seconds"] = (Math.abs(today.getTime() - lastActivity.getTime())) / 1000;
+  diff["minutes"] = Math.ceil(diff["seconds"] / 60);
+  diff["hours"] = Math.ceil(diff["minutes"] / 60);
+  diff["days"] = Math.ceil(diff["hours"] / 24);
+  diff["months"] = Math.ceil(diff["days"] / 30);
+  diff["years"] = Math.ceil(diff["months"] / 12);
+
+  keys = Object.getOwnPropertyNames(diff).reverse();
+  for (let i in keys){
+    key = keys[i];
+    value = diff[key];
+    if (value > 1)
+      return value + ' ' + key;
+  };
+  return '';
 }
 
 function effectsApplied(){
