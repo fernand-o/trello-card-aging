@@ -154,12 +154,13 @@ function applyCardAging(cardId, lastActivity) {
     agingLevel = 1
   }
 
-  if (agingLevel > 0){
-    for (let classname in ['aging-pirate', 'aging-regular', 'aging-level-1', 'aging-level-2', 'aging-level-3'])
-      card.removeClass(classname);
+  classes = ['aging-pirate', 'aging-regular', 'aging-level-1', 'aging-level-2', 'aging-level-3'];
+  classes.forEach((classname)=>{
+    card.removeClass(classname);
+  });
 
+  if (agingLevel > 0)
     card.addClass('aging-'+ Config.apply_aging_style +' aging-level-'+ agingLevel);
-  };
 }
 
 function dateDifferenceAsString(date){
