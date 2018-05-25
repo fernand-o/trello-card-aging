@@ -21,3 +21,5 @@ Creates an indicator at the bottom of the card, that shows the time difference b
 - [ ] Choose the position of the labels.
 - [ ] Define formats for the displayed information.
 - [ ] Define custom time ranges for the aging effects.
+
+- [ ] Add new aging effects
