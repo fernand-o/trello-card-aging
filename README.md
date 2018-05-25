@@ -23,3 +23,4 @@ Creates an indicator at the bottom of the card, that shows the time difference b
 - [ ] Define custom time ranges for the aging effects.
 
 - [ ] Add new aging effects
+- [ ] Improve the displayed times (1.1 year is being shown as 2 years)
