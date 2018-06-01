@@ -8,9 +8,9 @@ function findCard(shortLink){
   return $('.list-card[href*="'+shortLink+'"]');
 }
 
-function spanRealAge(creationDate, displayDate){
+function spanRealAge(creationDate){
   return $('<span/>', {
-    text: displayDate,
+    text: dateDifferenceAsString(creationDate),
     title: 'Created at ' + creationDate.toLocaleDateString("en-US"),
     class: 'card-label',
     css: {
@@ -22,9 +22,9 @@ function spanRealAge(creationDate, displayDate){
   });
 }
 
-function spanLastActivityDate(lastModDate, displayDate){
+function spanLastActivityDate(lastModDate){
   return $('<span/>', {
-    text: '🕒 ' + displayDate,
+    text: '🕒 ' + dateDifferenceAsString(lastModDate),
     title: 'Last activity at ' + lastModDate.toLocaleDateString("en-US"),
     class: 'card-label',
     css: {
@@ -51,37 +51,8 @@ function spanWrapper(cardId){
   return wrapper;
 }
 
-function applyRealAge(){
-  if (!Config.show_real_age)
-    return;
-
-  cardCreationActions = [
-    "createCard",
-    "copyCard",
-    "convertToCardFromCheckItem",
-    "moveCardFromBoard",
-    "moveCardToBoard"
-  ].join(",");
-
-  $.ajax({
-    url: getBoardURL()+"/cards/visible?fields=id,shortLink&actions="+cardCreationActions,
-    success: function(result) {
-      result.forEach((o)=>{
-        if (o.actions.length == 0)
-          return;
-
-        cardId = o.shortLink;
-        creationDate = new Date(o.actions[o.actions.length - 1].date);
-        displayDate = dateDifferenceAsString(creationDate);
-        if (Config.show_real_age)
-          spanRealAge(creationDate, displayDate).appendTo(spanWrapper(cardId));
-      });
-    }
-  });
-}
-
-function applyLastActivity(){
-  if (!(Config.show_age || Config.apply_aging))
+function applyDateEffects(){
+  if (!(Config.show_age || Config.apply_aging || Config.show_real_age))
     return;
 
   getListsIDsAndExecute(function(ids){
@@ -93,12 +64,15 @@ function applyLastActivity(){
             if (card.actions.length == 0)
               return;
 
-            lastModDate = new Date(card.actions[0].date);
-            displayDate = dateDifferenceAsString(lastModDate);
             cardId = card.shortLink;
+            creationDate = new Date(card.actions[card.actions.length -1].date)
+            lastModDate = new Date(card.actions[0].date);
+
+            if (Config.show_real_age)
+              spanRealAge(creationDate).appendTo(spanWrapper(cardId));
 
             if (Config.show_age)
-              spanLastActivityDate(lastModDate, displayDate).appendTo(spanWrapper(cardId));
+              spanLastActivityDate(lastModDate).appendTo(spanWrapper(cardId));
 
             if (Config.apply_aging)
               applyCardAging(cardId, lastModDate);
@@ -197,8 +171,7 @@ function applyEffects(configString) {
 
   loadConfig(configString);
   setTimeout(()=>{
-    applyRealAge();
-    applyLastActivity();
+    applyDateEffects();
   }, 300)
 
   setEffectsApplied();
