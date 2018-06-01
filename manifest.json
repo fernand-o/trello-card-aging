@@ -1,7 +1,7 @@
 {
     "name": "Trello Card Aging",
-    "version": "1.7",
-    "description": "Simulate the Card Aging Power Up",
+    "version": "1.8",
+    "description": "Adds some features to Trello, related with the card activity",
     "manifest_version": 2,
     "content_scripts": [{
         "matches": ["https://trello.com/b/*"],
