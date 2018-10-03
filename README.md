@@ -6,7 +6,7 @@ Provide some features related with the card age and activity.
 
 ## Aging effect
 The aging effect is the same as the one provided from the Card Aging power-up, except for one detail:
-In the official power up, the card aging is removed if someone just change the card position (drag and drop) inside a list. This extension considers the last activity of the card, what might be a comment, atacchment, anything who left a log inside the card.
+In the official power up, the card aging is removed if someone just changes the card position (drag and drop) inside a list. This extension considers the last activity of the card, what might be a comment, attachment, or anything that left a log inside the card.
 
 ## Last activity
 Creates an indicator at the bottom of the card, that shows the time difference between now and the last activity of the card.
